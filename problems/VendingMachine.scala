@@ -4,15 +4,47 @@ import Chisel._
 
 class VendingMachine extends Module {
   val io = new Bundle {
-    val nickel = Bool(INPUT)
-    val dime   = Bool(INPUT)
+    val nickel = Bool(INPUT) // 5 cents
+    val dime   = Bool(INPUT) // 10 cents
     val valid  = Bool(OUTPUT) }
   val sIdle :: s5 :: s10 :: s15 :: sOk :: Nil = 
     Enum(UInt(), 5)
   val state = Reg(init=sIdle)
 
-  // flush it out ...
-  state := s5
+  switch (state) {
+    is (sIdle) {
+      when (io.nickel) {
+        state := s5
+      } .elsewhen (io.dime) {
+        state := s10
+      }
+    }
+    is (s5) {
+      when (io.nickel) {
+        state := s10
+      } .elsewhen (io.dime) {
+        state := s15
+      }
+    }
+    is (s10) {
+      when (io.nickel) {
+        state := s15
+      } .elsewhen (io.dime) {
+        state := sOk
+      }
+    }
+    is (s15) {
+      when (io.nickel) {
+        state := sOk
+      } .elsewhen (io.dime) {
+        state := sOk // sOk5
+      }
+    }
+    is (sOk) {
+      state := sIdle
+    }
+  }
+
   io.valid := (state === sOk)
 }
 

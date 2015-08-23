@@ -7,9 +7,15 @@ class Accumulator extends Module {
     val in  = UInt(width = 1, dir = INPUT)
     val out = UInt(width = 8, dir = OUTPUT)
   }
-  // COUNT INCOMING TRUES
-  // FILL IN HERE ...
-  io.out := UInt(0)
+
+  var accum = Reg(UInt(width = io.out.getWidth()))
+  // accum := accum + io.in
+
+  when (io.in === UInt(1)) {
+    accum := accum + UInt(1)
+  }
+
+  io.out := accum
 }
 
 class AccumulatorTests(c: Accumulator) extends Tester(c) {

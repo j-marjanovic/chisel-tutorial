@@ -1,7 +1,6 @@
 package TutorialProblems
 
 import Chisel._
-import scala.collection.mutable.ArrayBuffer
 
 class Mul extends Module {
   val io = new Bundle {
@@ -9,15 +8,17 @@ class Mul extends Module {
     val y   = UInt(INPUT,  4)
     val z   = UInt(OUTPUT, 8)
   }
-  val muls = new ArrayBuffer[UInt]()
+  val muls = Vec.fill( 4 ) {UInt(width = 8)}
 
-  // -------------------------------- \\
-  // Calculate io.z = io.x * io.y by
-  // building filling out muls
-  // -------------------------------- \\
+  for ( i <- 0 to 3) {
+    when (io.y(i) === UInt(1)) {
+      muls(i) := io.x << UInt(i)
+    } .otherwise {
+      muls(i) := UInt(0)
+    }
+  }
 
-
-  // -------------------------------- \\
+  io.z := muls.reduceLeft(( a : UInt, b : UInt) => a + b)
 }
 
 class MulTests(c: Mul) extends Tester(c) {

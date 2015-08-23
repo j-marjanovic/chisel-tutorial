@@ -11,10 +11,17 @@ class DynamicMemorySearch(val n: Int, val w: Int) extends Module {
     val target = UInt(OUTPUT, log2Up(n))
     val done   = Bool(OUTPUT)
   }
+  val mem = Mem(Bits(width=w), n)
   val index  = Reg(init = UInt(0, width = log2Up(n)))
-  val memVal = UInt(0)
+  val memVal = mem(index)
   val done   = !io.en && ((memVal === io.data) || (index === UInt(n-1)))
-  // ...
+
+  // write
+  when (io.isWr) {
+    mem(io.wrAddr) := io.data
+  }
+
+  // look-up
   when (io.en) {
     index := UInt(0)
   } .elsewhen (done === Bool(false)) {

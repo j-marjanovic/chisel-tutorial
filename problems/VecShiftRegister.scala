@@ -9,8 +9,21 @@ class VecShiftRegister extends Module {
     val shift = Bool(INPUT)
     val out   = UInt(OUTPUT, 4)
   }
-  // FILL IN LOADABLE SHIFT REGISTER USING VEC 
-  io.out := UInt(0)
+
+  val regs = Vec.fill(4) { Reg(UInt()) }
+
+
+  when (io.load){
+    for (i <- 0 to 3) {
+      regs(i) := io.ins(i)
+    }
+  } .elsewhen (io.shift) {
+    for (i <- 1 to 3) {
+      regs(i) := regs(i-1)
+    }
+    regs (0) := io.ins(0)
+  }
+  io.out := regs(3)
 }
 
 class VecShiftRegisterTests(c: VecShiftRegister) extends Tester(c) { 

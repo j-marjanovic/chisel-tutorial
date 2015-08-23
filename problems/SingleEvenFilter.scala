@@ -15,17 +15,21 @@ class PredicateFilter[T <: Data](dtype: T, f: T => Bool) extends Filter(dtype) {
 
 object SingleFilter {
   def apply[T <: UInt](dtype: T) = 
-    Module(new PredicateFilter(dtype, (x: T) => Bool(false))) // FILL IN FUNCTION
+    Module(new PredicateFilter(dtype, (x: T) => x < UInt(10) ))
 }
 
 object EvenFilter {
   def apply[T <: UInt](dtype: T) = 
-    Module(new PredicateFilter(dtype, (x: T) => Bool(false))) // FILL IN FUNCTION
+    Module(new PredicateFilter(dtype, (x: T) => x(0) === UInt(0) ))
 }
 
 class SingleEvenFilter[T <: UInt](dtype: T) extends Filter(dtype) {
-  // CREATE COMPOSITION OF SINGLE AND EVEN FILTERS HERE ...
-  io.out <> io.in
+  val singleFilt = SingleFilter(dtype)
+  val evenFilt = EvenFilter(dtype)
+
+  io.in <> singleFilt.io.in
+  singleFilt.io.out <> evenFilt.io.in
+  io.out <> evenFilt.io.out
 }
 
 class SingleEvenFilterTests[T <: UInt](c: SingleEvenFilter[T]) extends Tester(c) {

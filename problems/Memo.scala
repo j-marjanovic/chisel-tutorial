@@ -18,7 +18,16 @@ class Memo extends Module {
   // When ren is asserted, rdData holds the output out of
   // reading the mem at rdAddr
   // --------------------------------------------------- \\
+  when (io.wen) {
+    mem(io.wrAddr) := io.wrData
+  }
 
+  var rdReg = Reg(UInt(8))
+  when (io.ren) {
+    rdReg := mem(io.rdAddr)
+  }
+
+  io.rdData := rdReg
 
   // --------------------------------------------------- \\
 

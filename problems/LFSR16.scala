@@ -7,8 +7,17 @@ class LFSR16 extends Module {
     val inc = Bool(INPUT)
     val out = UInt(OUTPUT, 16)
   }
-  // COMPUTE LFSR16 HERE
-  io.out := UInt(0)
+
+  val reg = Reg(UInt(width = io.out.getWidth()), init = UInt(1))
+
+  val new_bit = UInt(width = 1)
+  new_bit := reg(0) ^ reg(2) ^ reg(3) ^ reg(5)
+
+  when (io.inc === UInt(1)) {
+    reg := Cat( new_bit, reg(15, 1) )
+  }
+
+  io.out := reg
 }
 
 class LFSR16Tests(c: LFSR16) extends Tester(c) {
